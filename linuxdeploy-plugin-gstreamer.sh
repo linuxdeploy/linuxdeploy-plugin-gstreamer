@@ -84,6 +84,15 @@ for i in "$plugins_dir"/*; do
     cp "$i" "$plugins_target_dir"
 done
 
+$LINUXDEPLOY --appdir $APPDIR
+
+for i in "$plugins_target_dir"/*; do
+    [ -d "$i" ] && continue
+
+    patchelf --set-rpath '$ORIGIN/..:$ORIGIN' $i
+    echo "Manually setting rpath for $i"
+done
+
 mkdir -p "$helpers_target_dir"
 
 echo "Copying helpers in $helpers_target_dir"
