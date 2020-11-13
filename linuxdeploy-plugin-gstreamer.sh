@@ -63,8 +63,8 @@ else
     plugins_dir=/usr/lib/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION"
 fi
 
-if [ "$GSTREAMER_PLUGINS_DIR" != "" ]; then
-    helpers_dir="${GSTREAMER_PLUGINS_DIR}"
+if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
+    helpers_dir="${GSTREAMER_HELPERS_DIR}"
 else
     helpers_dir=/usr/lib/$(uname -m)-linux-gnu/gstreamer"$GSTREAMER_VERSION"/gstreamer-"$GSTREAMER_VERSION"
 fi
