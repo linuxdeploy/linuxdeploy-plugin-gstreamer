@@ -103,6 +103,13 @@ for i in "$helpers_dir"/*; do
     cp "$i" "$helpers_target_dir"
 done
 
+for i in "$helpers_target_dir"/*; do
+    [ -d "$i" ] && continue
+
+    patchelf --set-rpath '$ORIGIN/../..' $i
+    echo "Manually setting rpath for $i"
+done
+
 echo "Installing AppRun hook"
 mkdir -p "$APPDIR"/apprun-hooks
 
@@ -112,6 +119,7 @@ if [ "$GSTREAMER_VERSION" == "1.0" ]; then
 
 export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
 export GST_PLUGIN_SYSTEM_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
+export GST_PLUGIN_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
 
 export GST_PLUGIN_SCANNER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
 export GST_PTP_HELPER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-ptp-helper"
