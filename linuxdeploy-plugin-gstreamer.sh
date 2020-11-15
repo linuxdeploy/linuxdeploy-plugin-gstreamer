@@ -69,7 +69,7 @@ fi
 
 mkdir -p "$APPDIR"
 
-export GSTREAMER_VERSION=${GSTREAMER_VERSION:-1.0}
+export GSTREAMER_VERSION="${GSTREAMER_VERSION:-1.0}"
 
 plugins_target_dir="$APPDIR"/usr/lib/gstreamer-"$GSTREAMER_VERSION"
 helpers_target_dir="$APPDIR"/usr/lib/gstreamer"$GSTREAMER_VERSION"/gstreamer-"$GSTREAMER_VERSION"
@@ -101,13 +101,13 @@ for i in "$plugins_dir"/*; do
     cp "$i" "$plugins_target_dir"
 done
 
-$LINUXDEPLOY --appdir $APPDIR
+"$LINUXDEPLOY" --appdir "$APPDIR"
 
 for i in "$plugins_target_dir"/*; do
     [ -d "$i" ] && continue
 
-    patchelf --set-rpath '$ORIGIN/..:$ORIGIN' $i
     echo "Manually setting rpath for $i"
+    patchelf --set-rpath '$ORIGIN/..:$ORIGIN' "$i"
 done
 
 mkdir -p "$helpers_target_dir"
@@ -123,8 +123,8 @@ done
 for i in "$helpers_target_dir"/*; do
     [ -d "$i" ] && continue
 
-    patchelf --set-rpath '$ORIGIN/../..' $i
     echo "Manually setting rpath for $i"
+    patchelf --set-rpath '$ORIGIN/../..' "$i"
 done
 
 echo "Installing AppRun hook"
