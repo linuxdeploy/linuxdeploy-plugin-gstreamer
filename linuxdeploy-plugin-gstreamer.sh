@@ -50,6 +50,13 @@ if [ "$APPDIR" == "" ]; then
     exit 1
 fi
 
+if ! which patchelf &>/dev/null && ! type patchelf &>/dev/null; then
+    echo "Error: patchelf not found"
+    echo
+    show_usage
+    exit 2
+fi
+
 mkdir -p "$APPDIR"
 
 export GSTREAMER_VERSION=${GSTREAMER_VERSION:-1.0}
