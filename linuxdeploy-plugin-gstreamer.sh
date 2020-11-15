@@ -14,11 +14,14 @@ show_usage() {
     echo
     echo "Bundles GStreamer plugins into an AppDir"
     echo
-    echo "Variables:"
-    echo "  GSTREAMER_INCLUDE_BAD_PLUGINS=\"1\" (optional; default: disabled; set to empty string or unset to disable)"
-    echo "  GSTREAMER_PLUGINS_DIR=\"...\" (optional; directory containing GStreamer plugins; default: guessed based on main distro architecture)"
-    echo "  GSTREAMER_HELPERS_DIR=\"...\" (optional; directory containing GStreamer helper tools like gst-plugin-scanner; default: guessed based on main distro architecture)"
-    echo "  GSTREAMER_VERSION=\"1.0\" (optional; default: 1.0)"
+    echo "Required variables:"
+    echo "  LINUXDEPLOY=\".../linuxdeploy\" path to linuxdeploy (e.g., AppImage); set automatically when plugin is run directly by linuxdeploy"
+    echo
+    echo "Optional variables:"
+    echo "  GSTREAMER_INCLUDE_BAD_PLUGINS=\"1\" (default: disabled; set to empty string or unset to disable)"
+    echo "  GSTREAMER_PLUGINS_DIR=\"...\" (directory containing GStreamer plugins; default: guessed based on main distro architecture)"
+    echo "  GSTREAMER_HELPERS_DIR=\"...\" (directory containing GStreamer helper tools like gst-plugin-scanner; default: guessed based on main distro architecture)"
+    echo "  GSTREAMER_VERSION=\"1.0\" (default: 1.0)"
 }
 
 while [ "$1" != "" ]; do
@@ -55,6 +58,13 @@ if ! which patchelf &>/dev/null && ! type patchelf &>/dev/null; then
     echo
     show_usage
     exit 2
+fi
+
+if [[ "$LINUXDEPLOY" == "" ]]; then
+    echo "Error: \$LINUXDEPLOY not set"
+    echo
+    show_usage
+    exit 3
 fi
 
 mkdir -p "$APPDIR"
