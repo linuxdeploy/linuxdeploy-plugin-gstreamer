@@ -96,6 +96,7 @@ mkdir -p "$plugins_target_dir"
 echo "Copying plugins into $plugins_target_dir"
 for i in "$plugins_dir"/*; do
     [ -d "$i" ] && continue
+    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
     echo "Copying plugin: $i"
     cp "$i" "$plugins_target_dir"
@@ -105,6 +106,7 @@ done
 
 for i in "$plugins_target_dir"/*; do
     [ -d "$i" ] && continue
+    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
     echo "Manually setting rpath for $i"
     patchelf --set-rpath '$ORIGIN/..:$ORIGIN' "$i"
@@ -115,6 +117,7 @@ mkdir -p "$helpers_target_dir"
 echo "Copying helpers in $helpers_target_dir"
 for i in "$helpers_dir"/*; do
     [ -d "$i" ] && continue
+    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
     echo "Copying helper: $i"
     cp "$i" "$helpers_target_dir"
@@ -122,6 +125,7 @@ done
 
 for i in "$helpers_target_dir"/*; do
     [ -d "$i" ] && continue
+    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
     echo "Manually setting rpath for $i"
     patchelf --set-rpath '$ORIGIN/../..' "$i"
