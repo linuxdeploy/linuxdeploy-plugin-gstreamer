@@ -155,7 +155,7 @@ if [ "$GSTREAMER_VERSION" == "1.0" ]; then
 
 export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
 export GST_PLUGIN_SYSTEM_PATH_1_0="\${APPDIR}/${plugins_dir#"/"}"
-export GST_PLUGIN_PATH_1_0="\${APPDIR}/usr/${plugins_dir#"/"}"
+export GST_PLUGIN_PATH_1_0="\${APPDIR}/${plugins_dir#"/"}"
 
 export GST_PLUGIN_SCANNER_1_0="\${APPDIR}/${helpers_dir#"/"}/gst-plugin-scanner"
 export GST_PTP_HELPER_1_0="\${APPDIR}/${helpers_dir#"/"}/gst-ptp-helper"
