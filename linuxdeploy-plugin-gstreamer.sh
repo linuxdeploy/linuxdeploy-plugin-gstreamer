@@ -71,25 +71,38 @@ mkdir -p "$APPDIR"
 
 export GSTREAMER_VERSION="${GSTREAMER_VERSION:-1.0}"
 
-plugins_target_dir="$APPDIR"/usr/lib/gstreamer-"$GSTREAMER_VERSION"
-helpers_target_dir="$APPDIR"/usr/lib/gstreamer"$GSTREAMER_VERSION"/gstreamer-"$GSTREAMER_VERSION"
-
 if [ "$GSTREAMER_PLUGINS_DIR" != "" ]; then
     plugins_dir="${GSTREAMER_PLUGINS_DIR}"
 else
-    plugins_dir=/usr/lib/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION"
-fi
-
-if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
-    helpers_dir="${GSTREAMER_HELPERS_DIR}"
-else
-    helpers_dir=/usr/lib/$(uname -m)-linux-gnu/gstreamer"$GSTREAMER_VERSION"/gstreamer-"$GSTREAMER_VERSION"
+    for i in "/lib" "/usr/lib"; do
+        if [ -d $i/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION" ]; then
+	    plugins_dir=$i/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION"
+        elif [ -d $i/gstreamer-"$GSTREAMER_VERSION" ]; then
+	    plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
+	fi
+    done
+    if [ -z $plugins_dir ]; then
+	for i in "/lib$(getconf LONG_BIT)" "/usr/lib$(getconf LONG_BIT)"; do
+            [ -d $i/gstreamer-"$GSTREAMER_VERSION" ] && plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
+        done
+    fi
 fi
 
 if [ ! -d "$plugins_dir" ]; then
     echo "Error: could not find plugins directory: $plugins_dir"
     exit 1
+else
+    plugins_dir=$(readlink -f $plugins_dir)
 fi
+
+if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
+    helpers_dir="${GSTREAMER_HELPERS_DIR}"
+else
+    helpers_dir=$plugins_dir/gstreamer-"$GSTREAMER_VERSION"
+fi
+
+plugins_target_dir="$APPDIR"/${plugins_dir#"/"}
+helpers_target_dir="$APPDIR"/${helpers_dir#"/"}
 
 mkdir -p "$plugins_target_dir"
 
@@ -137,25 +150,25 @@ echo "Installing AppRun hook"
 mkdir -p "$APPDIR"/apprun-hooks
 
 if [ "$GSTREAMER_VERSION" == "1.0" ]; then
-    cat > "$APPDIR"/apprun-hooks/linuxdeploy-plugin-gstreamer.sh <<\EOF
+    cat > "$APPDIR"/apprun-hooks/linuxdeploy-plugin-gstreamer.sh <<EOF
 #! /bin/bash
 
 export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
-export GST_PLUGIN_SYSTEM_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
-export GST_PLUGIN_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
+export GST_PLUGIN_SYSTEM_PATH_1_0="\${APPDIR}/${plugins_dir#"/"}"
+export GST_PLUGIN_PATH_1_0="\${APPDIR}/usr/${plugins_dir#"/"}"
 
-export GST_PLUGIN_SCANNER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
-export GST_PTP_HELPER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-ptp-helper"
+export GST_PLUGIN_SCANNER_1_0="\${APPDIR}/${helpers_dir#"/"}/gst-plugin-scanner"
+export GST_PTP_HELPER_1_0="\${APPDIR}/${helpers_dir#"/"}/gst-ptp-helper"
 EOF
 elif [ "$GSTREAMER_VERSION" == "0.10" ]; then
-    cat > "$APPDIR"/apprun-hooks/linuxdeploy-plugin-gstreamer.sh <<\EOF
+    cat > "$APPDIR"/apprun-hooks/linuxdeploy-plugin-gstreamer.sh <<EOF
 #! /bin/bash
 
 export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
-export GST_PLUGIN_SYSTEM_PATH_0_10="${APPDIR}/usr/lib/gstreamer-1.0"
+export GST_PLUGIN_SYSTEM_PATH_0_10="\${APPDIR}/${plugins_dir#"/"}"
 
-export GST_PLUGIN_SCANNER_0_10="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
-export GST_PTP_HELPER_0_10="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-ptp-helper"
+export GST_PLUGIN_SCANNER_0_10="\${APPDIR}/${helpers_dir#"/"}/gst-plugin-scanner"
+export GST_PTP_HELPER_0_10="\${APPDIR}/${helpers_dir#"/"}/gst-ptp-helper"
 EOF
 else
     echo "Warning: unknown GStreamer version: $GSTREAMER_VERSION, cannot install AppRun hook"
