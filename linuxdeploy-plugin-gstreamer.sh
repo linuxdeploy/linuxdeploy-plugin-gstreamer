@@ -75,15 +75,15 @@ if [ "$GSTREAMER_PLUGINS_DIR" != "" ]; then
     plugins_dir="${GSTREAMER_PLUGINS_DIR}"
 else
     for i in "/lib" "/usr/lib"; do
-        if [ -d $i/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION" ]; then
+        if [ -d "$i/$(uname -m)-linux-gnu/gstreamer-$GSTREAMER_VERSION" ]; then
 	    plugins_dir=$i/$(uname -m)-linux-gnu/gstreamer-"$GSTREAMER_VERSION"
         elif [ -d $i/gstreamer-"$GSTREAMER_VERSION" ]; then
 	    plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
 	fi
     done
-    if [ -z $plugins_dir ]; then
+    if [ -z "$plugins_dir" ]; then
 	for i in "/lib$(getconf LONG_BIT)" "/usr/lib$(getconf LONG_BIT)"; do
-            [ -d $i/gstreamer-"$GSTREAMER_VERSION" ] && plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
+            [ -d "$i/gstreamer-$GSTREAMER_VERSION" ] && plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
         done
     fi
 fi
@@ -92,7 +92,7 @@ if [ ! -d "$plugins_dir" ]; then
     echo "Error: could not find plugins directory: $plugins_dir"
     exit 1
 else
-    plugins_dir=$(readlink -f $plugins_dir)
+    plugins_dir=$(readlink -f "$plugins_dir")
 fi
 
 if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
