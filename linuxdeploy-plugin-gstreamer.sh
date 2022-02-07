@@ -127,7 +127,7 @@ done
 for i in "$helpers_target_dir"/*; do
     [ -d "$i" ] && continue
     [ ! -f "$i" ] && echo "File does not exist: $i" && continue
-    $(file "$i" | grep -v ELF --silent) && echo "Ignoring non ELF file: $i" && continue
+    (file "$i" | grep -v ELF --silent) && echo "Ignoring non ELF file: $i" && continue
 
     echo "Manually setting rpath for $i"
     patchelf --set-rpath '$ORIGIN/../..' "$i"
