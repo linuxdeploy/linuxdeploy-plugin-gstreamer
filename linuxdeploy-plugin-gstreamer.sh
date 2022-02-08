@@ -72,7 +72,7 @@ mkdir -p "$APPDIR"
 export GSTREAMER_VERSION="${GSTREAMER_VERSION:-1.0}"
 
 if [ "$GSTREAMER_PLUGINS_DIR" != "" ]; then
-    plugins_dir="${GSTREAMER_PLUGINS_DIR}"
+    plugins_dir="${GSTREAMER_PLUGINS_DIR%"/"}"
 else
     for i in "/lib" "/usr/lib"; do
         if [ -d "$i/$(uname -m)-linux-gnu/gstreamer-$GSTREAMER_VERSION" ]; then
@@ -96,7 +96,7 @@ else
 fi
 
 if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
-    helpers_dir="${GSTREAMER_HELPERS_DIR}"
+    helpers_dir="${GSTREAMER_HELPERS_DIR%"/"}"
 else
     helpers_dir=$plugins_dir/gstreamer-"$GSTREAMER_VERSION"
 fi
