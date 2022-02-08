@@ -81,7 +81,7 @@ else
 	    plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
 	fi
     done
-    if [ -z "$plugins_dir" ]; then
+    if [ ! -d "$plugins_dir" ]; then
 	for i in "/lib$(getconf LONG_BIT)" "/usr/lib$(getconf LONG_BIT)"; do
             [ -d "$i/gstreamer-$GSTREAMER_VERSION" ] && plugins_dir=$i/gstreamer-"$GSTREAMER_VERSION"
         done
