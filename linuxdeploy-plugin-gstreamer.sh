@@ -88,17 +88,29 @@ else
     fi
 fi
 
+plugins_dir=$(readlink -f "$plugins_dir")
 if [ ! -d "$plugins_dir" ]; then
     echo "Error: could not find plugins directory: $plugins_dir"
     exit 1
-else
-    plugins_dir=$(readlink -f "$plugins_dir")
 fi
 
 if [ "$GSTREAMER_HELPERS_DIR" != "" ]; then
     helpers_dir="${GSTREAMER_HELPERS_DIR%"/"}"
 else
-    helpers_dir=$plugins_dir/gstreamer-"$GSTREAMER_VERSION"
+    if [ -f "$plugins_dir/gstreamer-$GSTREAMER_VERSION/gst-plugin-scanner" ]; then
+        helpers_dir=$plugins_dir/gstreamer-"$GSTREAMER_VERSION"
+    elif [ -f "$plugins_dir/gst-plugin-scanner" ]; then
+        helpers_dir=$plugins_dir
+    else
+        echo "Error: could not find gst-plugin-scanner"
+        echo "Error: failed to locate gstreamer helpers directory automatically"
+        echo "Error: please consider to specify \$GSTREAMER_HELPERS_DIR"
+    fi
+fi
+
+helpers_dir=$(readlink -f "$helpers_dir")
+if [ ! -d "$helpers_dir" ]; then
+    echo "Error: could not find helpers directory: $helpers_dir"
 fi
 
 plugins_target_dir="$APPDIR"/${plugins_dir#"/"}
@@ -106,7 +118,8 @@ helpers_target_dir="$APPDIR"/${helpers_dir#"/"}
 
 mkdir -p "$plugins_target_dir"
 
-echo "Copying plugins into $plugins_target_dir"
+[ ! "$plugins_dir" = "$helpers_dir" ] && echo "Copying plugins into $plugins_target_dir"
+[ "$plugins_dir" = "$helpers_dir" ] && echo "Copying plugins and helpers into $plugins_target_dir"
 for i in "$plugins_dir"/*; do
     [ -d "$i" ] && continue
     [ ! -f "$i" ] && echo "File does not exist: $i" && continue
@@ -126,25 +139,27 @@ for i in "$plugins_target_dir"/*; do
     patchelf --set-rpath '$ORIGIN/..:$ORIGIN' "$i"
 done
 
-mkdir -p "$helpers_target_dir"
+if [ -n "$helpers_dir" ] && [ ! "$helpers_dir" = "$plugins_dir" ]; then
+    mkdir -p "$helpers_target_dir"
 
-echo "Copying helpers in $helpers_target_dir"
-for i in "$helpers_dir"/*; do
-    [ -d "$i" ] && continue
-    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
+    echo "Copying helpers in $helpers_target_dir"
+    for i in "$helpers_dir"/*; do
+        [ -d "$i" ] && continue
+        [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
-    echo "Copying helper: $i"
-    cp "$i" "$helpers_target_dir"
-done
+        echo "Copying helper: $i"
+        cp "$i" "$helpers_target_dir"
+    done
 
-for i in "$helpers_target_dir"/*; do
-    [ -d "$i" ] && continue
-    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
-    (file "$i" | grep -v ELF --silent) && echo "Ignoring non ELF file: $i" && continue
+    for i in "$helpers_target_dir"/*; do
+        [ -d "$i" ] && continue
+        [ ! -f "$i" ] && echo "File does not exist: $i" && continue
+        (file "$i" | grep -v ELF --silent) && echo "Ignoring non ELF file: $i" && continue
 
-    echo "Manually setting rpath for $i"
-    patchelf --set-rpath '$ORIGIN/../..' "$i"
-done
+        echo "Manually setting rpath for $i"
+        patchelf --set-rpath '$ORIGIN/../..' "$i"
+    done
+fi
 
 echo "Installing AppRun hook"
 mkdir -p "$APPDIR"/apprun-hooks
