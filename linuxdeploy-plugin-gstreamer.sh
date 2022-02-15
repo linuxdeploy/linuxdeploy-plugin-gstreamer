@@ -140,7 +140,7 @@ helpers_target_dir="$APPDIR"/${helpers_dir#"/"}
 
 mkdir -p "$plugins_target_dir"
 
-[ ! "$plugins_dir" = "$helpers_dir" ] && echo "Copying plugins into $plugins_target_dir"
+[ "$plugins_dir" != "$helpers_dir" ] && echo "Copying plugins into $plugins_target_dir"
 [ "$plugins_dir" = "$helpers_dir" ] && echo "Copying plugins and helpers into $plugins_target_dir"
 for i in "$plugins_dir"/*; do
     [ -d "$i" ] && continue
@@ -162,7 +162,7 @@ for i in "$plugins_target_dir"/*; do
 done
 
 # $helpers_dir may be empty if helpers not found and $GSTREAMER_HELPERS_DIR not set in previous steps.
-if [ -n "$helpers_dir" ] && [ ! "$helpers_dir" = "$plugins_dir" ]; then
+if [ -n "$helpers_dir" ] && [ "$helpers_dir" != "$plugins_dir" ]; then
     mkdir -p "$helpers_target_dir"
 
     echo "Copying helpers in $helpers_target_dir"
