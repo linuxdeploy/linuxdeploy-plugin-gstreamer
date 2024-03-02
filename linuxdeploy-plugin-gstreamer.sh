@@ -18,6 +18,7 @@ show_usage() {
     echo "  LINUXDEPLOY=\".../linuxdeploy\" path to linuxdeploy (e.g., AppImage); set automatically when plugin is run directly by linuxdeploy"
     echo
     echo "Optional variables:"
+    echo "  GSTREAMER_ALLOWED_PLUGINS=\"libgstx265.so,libgstx264.so\" (comma-separated list of plugins to deploy. Deploy all plugins, if empty; default: empty)"
     echo "  GSTREAMER_INCLUDE_BAD_PLUGINS=\"1\" (default: disabled; set to empty string or unset to disable)"
     echo "  GSTREAMER_PLUGINS_DIR=\"...\" (directory containing GStreamer plugins; default: guessed based on main distro architecture)"
     echo "  GSTREAMER_HELPERS_DIR=\"...\" (directory containing GStreamer helper tools like gst-plugin-scanner; default: guessed based on main distro architecture)"
@@ -97,11 +98,13 @@ mkdir -p "$plugins_target_dir"
 
 echo "Copying plugins into $plugins_target_dir"
 for i in "$plugins_dir"/*; do
-    [ -d "$i" ] && continue
-    [ ! -f "$i" ] && echo "File does not exist: $i" && continue
+    if [[ -z $GSTREAMER_ALLOWED_PLUGINS ]] || [[ ",$GSTREAMER_ALLOWED_PLUGINS," = *",$(basename $i),"* ]]; then
+        [ -d "$i" ] && continue
+        [ ! -f "$i" ] && echo "File does not exist: $i" && continue
 
-    echo "Copying plugin: $i"
-    cp "$i" "$plugins_target_dir"
+        echo "Copying plugin: $i"
+        cp "$i" "$plugins_target_dir"
+    fi
 done
 
 "$LINUXDEPLOY" --appdir "$APPDIR"
