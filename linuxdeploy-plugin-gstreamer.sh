@@ -146,8 +146,8 @@ export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
 export GST_PLUGIN_SYSTEM_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
 export GST_PLUGIN_PATH_1_0="${APPDIR}/usr/lib/gstreamer-1.0"
 
-export GST_PLUGIN_SCANNER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
-export GST_PTP_HELPER_1_0="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-ptp-helper"
+export GST_PLUGIN_SCANNER_1_0="${APPDIR}/usr/lib/gstreamer-1.0/gst-plugin-scanner"
+export GST_PTP_HELPER_1_0="${APPDIR}/usr/lib/gstreamer-1.0/gst-ptp-helper"
 EOF
 elif [ "$GSTREAMER_VERSION" == "0.10" ]; then
     cat > "$APPDIR"/apprun-hooks/linuxdeploy-plugin-gstreamer.sh <<\EOF
@@ -156,8 +156,8 @@ elif [ "$GSTREAMER_VERSION" == "0.10" ]; then
 export GST_REGISTRY_REUSE_PLUGIN_SCANNER="no"
 export GST_PLUGIN_SYSTEM_PATH_0_10="${APPDIR}/usr/lib/gstreamer-1.0"
 
-export GST_PLUGIN_SCANNER_0_10="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
-export GST_PTP_HELPER_0_10="${APPDIR}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-ptp-helper"
+export GST_PLUGIN_SCANNER_0_10="${APPDIR}/usr/lib/gstreamer-1.0/gst-plugin-scanner"
+export GST_PTP_HELPER_0_10="${APPDIR}/usr/lib/gstreamer-1.0/gst-ptp-helper"
 EOF
 else
     echo "Warning: unknown GStreamer version: $GSTREAMER_VERSION, cannot install AppRun hook"
